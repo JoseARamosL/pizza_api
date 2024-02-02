@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PizzaRepository::class)]
-#[ApiResource]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource]
 class Pizza
 {
     #[ORM\Id]
@@ -20,6 +20,7 @@ class Pizza
     private ?int $id = null;
 
     #[ORM\Column(length: 48)]
+    #[Assert\NotBlank(groups: ['create'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::JSON)]
@@ -39,7 +40,11 @@ class Pizza
 
     #[ORM\Column(nullable: false)]
     #[Assert\NotBlank(message: "El campo special es obligatorio al crear", groups: ['insert'])]
-    #[ApiProperty(readable: true, writable: true, writableLink: false)]
+    #[ApiProperty(
+        readable: true,
+        writable: true,
+        writableLink: false
+    )]
     private ?bool $special = null;
 
     public function getId(): ?int
@@ -114,7 +119,10 @@ class Pizza
 
     public function setSpecial(?bool $special): static
     {
-        $this->special = $special;
+
+        if ($this->special === null) {
+            $this->special = $special;
+        }
 
         return $this;
     }
